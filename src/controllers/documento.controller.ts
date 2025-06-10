@@ -1,32 +1,38 @@
 import { Request, Response } from 'express';
-import { crmPost, crmGet } from '../services/crm.service';
-import { validateDocument } from '../services/openai.service';
+import { crmGet } from '../services/crm.service';
+import { uploadToCrm } from '../services/crmDocument.service';
 import prisma from '../utils/prisma';
 
 export const uploadDocumento = async (req: Request, res: Response) => {
   try {
-    const file = req.body.filePath as string; // Ruta temporal del archivo
-    const crmResponse = await crmPost('/documento/upload', req.crmToken!, {
-      file,
-    });
-    const validation = await validateDocument(file);
+    const { document_id, expedient_id } = req.body as {
+      document_id?: string;
+      expedient_id?: string;
+    };
+
+    if (!req.file || !document_id || !expedient_id) {
+      return res
+        .status(400)
+        .json({ error: 'document_id, expedient_id y archivo requeridos' });
+    }
+
+    const upload = await uploadToCrm(
+      req.crmToken!,
+      document_id,
+      expedient_id,
+      req.file
+    );
 
     const record = await prisma.documentFile.create({
       data: {
-        filename: file,
-        crmDocumentId: crmResponse.id,
+        documentTemplateId: Number(document_id),
+        expedientId: Number(expedient_id),
+        crmDocumentId: upload.crm_document_id,
+        fileName: req.file.originalname,
       },
     });
 
-    await prisma.documentoEstado.create({
-      data: {
-        documentId: record.id,
-        estado: validation ? 'Pre Aprobado' : 'Pre Denegado',
-        observacionAI: validation,
-      },
-    });
-
-    res.json(record);
+    res.json({ message: 'Documento subido', id: record.id });
   } catch (error) {
     res.status(500).json({ error: 'Error al subir documento' });
   }

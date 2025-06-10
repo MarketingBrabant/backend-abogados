@@ -27,11 +27,13 @@ model UserSession {
 }
 
 model DocumentFile {
-  id            Int      @id @default(autoincrement())
-  filename      String
-  crmDocumentId String?
-  createdAt     DateTime @default(now())
-  estados       DocumentoEstado[]
+  id                 Int      @id @default(autoincrement())
+  documentTemplateId Int
+  expedientId        Int
+  crmDocumentId      String
+  fileName           String
+  createdAt          DateTime @default(now())
+  estados            DocumentoEstado[]
 }
 
 model DocumentoEstado {
