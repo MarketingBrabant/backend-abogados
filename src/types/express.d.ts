@@ -6,6 +6,11 @@ declare global {
       crmToken?: string;
       userId?: number;
       userRole?: Role;
+      file?: {
+        buffer: Buffer;
+        originalname: string;
+        mimetype: string;
+      };
     }
   }
 }
