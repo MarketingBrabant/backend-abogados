@@ -1,38 +1,50 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../utils/prisma';
-import { Role } from '@prisma/client';
+
+// Tipo extendido explícito
+type TypedRequest = Request & {
+  userId?: number;
+  userRole?: string;
+  user?: any;
+};
 
 export const attachRole = async (
-  req: Request,
+  req: TypedRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const userId = req.userId;
+
     if (!userId) {
-      res.status(401).json({ error: 'Usuario no identificado' });
-      return;
+      return res.status(401).json({ error: 'No autenticado' });
     }
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId }, // usa 'id', no 'personId'
+    });
+
     if (!user) {
-      res.status(401).json({ error: 'Usuario no encontrado' });
-      return;
+      return res.status(404).json({ error: 'Usuario no encontrado' });
     }
+
     req.userRole = user.role;
     req.user = user;
+
     next();
   } catch (error) {
     next(error);
   }
 };
 
-export const requireRole = (roles: Role[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+export const requireRole = (roles: string[]) => {
+  return (req: TypedRequest, res: Response, next: NextFunction) => {
     const role = req.userRole;
+
     if (!role || !roles.includes(role)) {
-      res.status(403).json({ error: 'Permiso denegado' });
-      return;
+      return res.status(403).json({ error: 'Acceso denegado' });
     }
+
     next();
   };
 };
