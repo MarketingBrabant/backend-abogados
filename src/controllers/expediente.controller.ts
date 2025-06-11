@@ -1,21 +1,21 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { crmGet } from '../services/crm.service';
 
-export const getExpedientes = async (req: Request, res: Response) => {
-  try {
-    const data = await crmGet('/expedientes', req.crmToken!);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener expedientes' });
-  }
+export const getExpedientes = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+): Promise<void> => {
+  const data = await crmGet('/expedientes', req.crmToken!);
+  res.status(200).json(data);
 };
 
-export const getDocumentos = async (req: Request, res: Response) => {
+export const getDocumentos = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+): Promise<void> => {
   const { expedienteId } = req.params;
-  try {
-    const data = await crmGet(`/documentos/${expedienteId}`, req.crmToken!);
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener documentos' });
-  }
+  const data = await crmGet(`/documentos/${expedienteId}`, req.crmToken!);
+  res.status(200).json(data);
 };
