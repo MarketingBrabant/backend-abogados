@@ -6,15 +6,21 @@ export const loginConCRM = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { email, password } = req.body;
+  // 1) Imprimimos en consola lo que llega en el body
+  console.log('––––––––––––––––––––––––––––––––––');
+  console.log('BODY RECIBIDO en /auth/login:', JSON.stringify(req.body));
+  console.log('––––––––––––––––––––––––––––––––––');
 
+  const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400).json({ error: 'Email y contraseña son requeridos.' });
+    console.log('Faltan email o password');
+    res.status(400).json({ error: 'Email y contraseña requeridos' });
     return;
   }
 
   try {
-    const response = await axios.post(
+    // 2) Llamada al CRM con Basic Auth + User-Agent + Customer headers
+    const crmResponse = await axios.post(
       'https://gestion.lemornebrabant.com/api/portal/login',
       { username: email, password },
       {
@@ -23,20 +29,30 @@ export const loginConCRM = async (
           password: '4ffa4075-414c-401e-81ed-110c94f44333',
         },
         headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Lemorne-API ACCESS',
           'Customer-Addr': req.ip,
           'Customer-Bearer': '',
         },
       }
     );
 
-    const { status, result } = response.data;
-
+    const { status, result } = crmResponse.data;
     if (status === 200) {
-      res.status(200).json({ session_token: result.token, user: result.user });
+      console.log('CRM login exitoso, token:', result.token);
+      res.status(200).json({
+        session_token: result.token,
+        user: result.user,
+      });
     } else {
-      res.status(401).json({ error: 'Credenciales incorrectas' });
+      console.log('CRM devolvió error:', result);
+      res.status(401).json({ error: result });
     }
-  } catch (error) {
-    next(error);
+  } catch (err: any) {
+    console.error('Error conectando con CRM:', err.message);
+    next(err);
   }
 };
+
+
+
