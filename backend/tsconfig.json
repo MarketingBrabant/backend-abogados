@@ -11,7 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "types": ["node"],
-    "typeRoots": ["./src/types", "./node_modules/@types"],
     "resolveJsonModule": true,
     "typeRoots": ["./node_modules/@types", "./src/types"]
   }
