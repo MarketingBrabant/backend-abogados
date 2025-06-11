@@ -1,3 +1,6 @@
+/// <reference path="../types/express.d.ts" />
+
+
 import { Request, Response, NextFunction } from 'express';
 import { crmGet } from '../services/crm.service';
 

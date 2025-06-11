@@ -1,10 +1,12 @@
 import { User, Role } from '@prisma/client';
 
-declare namespace Express {
-  export interface Request {
-    crmToken?: string;
-    userId?: number;
-    userRole?: Role;
-    user?: User;
+declare global {
+  namespace Express {
+    interface Request {
+      crmToken?: string;
+      userId?: string;
+      userRole?: Role;
+      user?: User;
+    }
   }
 }

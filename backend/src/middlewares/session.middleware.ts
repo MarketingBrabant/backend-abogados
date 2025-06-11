@@ -5,9 +5,10 @@ export const requireSession = async (
   req: Request,
   res: Response,
   next: NextFunction
-) : Promise<void> => {
+): Promise<void> => {
   try {
     const token = req.headers['x-session-token'];
+
     if (!token || typeof token !== 'string') {
       res.status(401).json({ error: 'Token de sesión requerido' });
       return;
@@ -22,10 +23,23 @@ export const requireSession = async (
       return;
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.userId },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+      return;
+    }
+
     req.crmToken = session.crmToken;
-    req.userId = session.userId;
+    req.userId = String(user.id);
+    req.user = user;
+    req.userRole = user.role;
+
     next();
   } catch (error) {
     next(error);
   }
 };
+

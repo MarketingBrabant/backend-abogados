@@ -7,38 +7,35 @@ export const attachRole = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  try {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    if (!userId) {
-      return res.status(401).json({ error: 'No autenticado' });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId }, // usa 'id', no 'personId'
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: 'Usuario no encontrado' });
-    }
-
-    req.userRole = user.role;
-    req.user = user;
-
-    next();
-  } catch (error) {
-    next(error);
+  if (!userId) {
+    res.status(401).json({ error: 'No autenticado' });
+    return;
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: parseInt(userId) },
+  });
+
+  if (!user) {
+    res.status(404).json({ error: 'Usuario no encontrado' });
+    return;
+  }
+
+  req.userRole = user.role;
+  req.user = user;
+  next();
 };
 
 export const requireRole = (roles: Role[]) => {
   return (req: Request, res: Response, next: NextFunction): void => {
     const role = req.userRole;
-
     if (!role || !roles.includes(role)) {
-      return res.status(403).json({ error: 'Acceso denegado' });
+      res.status(403).json({ error: 'Acceso denegado' });
+      return;
     }
-
     next();
   };
 };
+

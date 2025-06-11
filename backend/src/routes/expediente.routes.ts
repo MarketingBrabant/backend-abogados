@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import multer from 'multer';
+import multer from 'multer'; // ✅ Correcto
 import { getExpedientes, getDocumentos } from '../controllers/expediente.controller';
 import { uploadDocumento, descargarDocumento } from '../controllers/documento.controller';
 import { getNotificaciones } from '../controllers/notificacion.controller';
@@ -10,18 +10,13 @@ import { catchAsync } from '../utils/catchAsync'; // 👈 añadimos nuestro wrap
 
 const router = Router();
 
+
+import { Request } from 'express'; // asegúrate de tener esto importado
+
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
-  fileFilter: (_req, file, cb) => {
-    const allowed = ['application/pdf', 'image/png', 'image/jpeg'];
-    if (allowed.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Tipo de archivo no permitido'));
-    }
-  },
 });
+
 
 // Middleware global para todas las rutas
 router.use(requireSession, attachRole);
