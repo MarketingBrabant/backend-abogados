@@ -15,7 +15,21 @@ export const uploadDocumento = async (
     };
 
     if (!req.file || !document_id || !expedient_id) {
-      res.status(400).json({ error: 'document_id, expedient_id y archivo requeridos' });
+      res
+        .status(400)
+        .json({ error: 'document_id, expedient_id y archivo requeridos' });
+      return;
+    }
+
+    // Validación opcional de tipo MIME y tamaño
+    if (req.file.size > 10 * 1024 * 1024) {
+      res.status(400).json({ error: 'El archivo excede el tamaño máximo de 10MB' });
+      return;
+    }
+
+    const allowedMime = ['application/pdf', 'image/png', 'image/jpeg'];
+    if (!allowedMime.includes(req.file.mimetype)) {
+      res.status(400).json({ error: 'Tipo de archivo no permitido' });
       return;
     }
 
