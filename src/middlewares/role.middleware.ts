@@ -10,11 +10,13 @@ export const attachRole = async (
   try {
     const userId = req.userId;
     if (!userId) {
-      return res.status(401).json({ error: 'Usuario no identificado' });
+      res.status(401).json({ error: 'Usuario no identificado' });
+      return;
     }
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      return res.status(401).json({ error: 'Usuario no encontrado' });
+      res.status(401).json({ error: 'Usuario no encontrado' });
+      return;
     }
     req.userRole = user.role;
     next();
@@ -27,7 +29,8 @@ export const requireRole = (roles: Role[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const role = req.userRole;
     if (!role || !roles.includes(role)) {
-      return res.status(403).json({ error: 'Permiso denegado' });
+      res.status(403).json({ error: 'Permiso denegado' });
+      return;
     }
     next();
   };
