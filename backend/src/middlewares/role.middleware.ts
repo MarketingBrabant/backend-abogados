@@ -1,18 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../utils/prisma';
-
-// Tipo extendido explícito
-type TypedRequest = Request & {
-  userId?: number;
-  userRole?: string;
-  user?: any;
-};
+import { Role } from '@prisma/client';
 
 export const attachRole = async (
-  req: TypedRequest,
+  req: Request,
   res: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   try {
     const userId = req.userId;
 
@@ -37,8 +31,8 @@ export const attachRole = async (
   }
 };
 
-export const requireRole = (roles: string[]) => {
-  return (req: TypedRequest, res: Response, next: NextFunction) => {
+export const requireRole = (roles: Role[]) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const role = req.userRole;
 
     if (!role || !roles.includes(role)) {

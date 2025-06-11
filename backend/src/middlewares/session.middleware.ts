@@ -5,7 +5,7 @@ export const requireSession = async (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+) : Promise<void> => {
   try {
     const token = req.headers['x-session-token'];
     if (!token || typeof token !== 'string') {
