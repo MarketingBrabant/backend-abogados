@@ -1,12 +1,12 @@
-import { User } from '@prisma/client';
+import { User, Role } from '@prisma/client';
 
-declare namespace Express {
-  export interface Request {
-    crmToken?: string;
-    user?: User;
-    userId?: number;
-    userRole?: string;
-    file?: Express.Multer.File;
-    files?: Express.Multer.File[];
+declare global {
+  namespace Express {
+    interface Request {
+      crmToken?: string;
+      userId?: number;
+      user?: User;
+      userRole?: Role;
+    }
   }
 }
