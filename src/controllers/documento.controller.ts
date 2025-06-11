@@ -1,9 +1,13 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { crmGet } from '../services/crm.service';
 import { uploadToCrm } from '../services/crmDocument.service';
 import prisma from '../utils/prisma';
 
-export const uploadDocumento = async (req: Request, res: Response) => {
+export const uploadDocumento = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { document_id, expedient_id } = req.body as {
       document_id?: string;
@@ -11,9 +15,8 @@ export const uploadDocumento = async (req: Request, res: Response) => {
     };
 
     if (!req.file || !document_id || !expedient_id) {
-      return res
-        .status(400)
-        .json({ error: 'document_id, expedient_id y archivo requeridos' });
+      res.status(400).json({ error: 'document_id, expedient_id y archivo requeridos' });
+      return;
     }
 
     const upload = await uploadToCrm(
@@ -32,22 +35,31 @@ export const uploadDocumento = async (req: Request, res: Response) => {
       },
     });
 
-    res.json({ message: 'Documento subido', id: record.id });
+    res.status(200).json({ message: 'Documento subido', id: record.id });
   } catch (error) {
-    res.status(500).json({ error: 'Error al subir documento' });
+    next(error); // 🔁 esto permite que el sistema de errores lo maneje
   }
 };
 
-export const descargarDocumento = async (req: Request, res: Response) => {
+export const descargarDocumento = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { documentId } = req.body;
     const documento = await prisma.documentFile.findUnique({
       where: { id: documentId },
     });
-    if (!documento) return res.status(404).json({ error: 'No encontrado' });
+
+    if (!documento) {
+      res.status(404).json({ error: 'Documento no encontrado' });
+      return;
+    }
+
     const data = await crmGet(`/documento/${documento.crmDocumentId}`, req.crmToken!);
-    res.json(data);
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Error al descargar' });
+    next(error);
   }
 };
