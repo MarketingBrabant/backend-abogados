@@ -8,6 +8,11 @@ export const loginConCRM = async (
 ): Promise<void> => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    res.status(400).json({ error: 'Email y contraseña son requeridos.' });
+    return;
+  }
+
   try {
     const response = await axios.post(
       'https://gestion.lemornebrabant.com/api/portal/login',

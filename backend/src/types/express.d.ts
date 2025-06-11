@@ -1,4 +1,4 @@
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 
 declare global {
   namespace Express {
@@ -6,6 +6,7 @@ declare global {
       crmToken?: string;
       userId?: number;
       userRole?: Role;
+      user?: User;
       file?: {
         buffer: Buffer;
         originalname: string;

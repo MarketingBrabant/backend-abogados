@@ -19,6 +19,7 @@ export const attachRole = async (
       return;
     }
     req.userRole = user.role;
+    req.user = user;
     next();
   } catch (error) {
     next(error);
