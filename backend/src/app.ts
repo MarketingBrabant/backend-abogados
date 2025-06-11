@@ -15,3 +15,6 @@ app.use('/api', routes);
 app.use(errorHandler);
 
 export default app;
+
+import authRoutes from './routes/auth.routes';
+app.use('/auth', authRoutes);
