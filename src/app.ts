@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import routes from './routes';
 import { ipAudit } from './middlewares/ipAudit.middleware';
-import errorHandler from './middlewares/error.middleware';
+import { errorHandler } from './middlewares/error.middleware';
 
 const app = express();
 

@@ -1,16 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 
-export type AsyncHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => Promise<void>;
+type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
-export const catchAsync = (fn: AsyncHandler) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+export function catchAsync(fn: AsyncHandler) {
+  return function (req: Request, res: Response, next: NextFunction) {
     fn(req, res, next).catch(next);
   };
-};
-
-export default catchAsync;
+}
 

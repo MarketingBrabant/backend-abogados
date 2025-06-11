@@ -9,7 +9,8 @@ export const requireSession = async (
   try {
     const token = req.headers['x-session-token'];
     if (!token || typeof token !== 'string') {
-      return res.status(401).json({ error: 'Token de sesión requerido' });
+      res.status(401).json({ error: 'Token de sesión requerido' });
+      return;
     }
 
     const session = await prisma.userSession.findUnique({
@@ -17,7 +18,8 @@ export const requireSession = async (
     });
 
     if (!session) {
-      return res.status(401).json({ error: 'Sesión inválida' });
+      res.status(401).json({ error: 'Sesión inválida' });
+      return;
     }
 
     req.crmToken = session.crmToken;
